@@ -12,7 +12,7 @@ class Song:
 
     cid = '205361747'
     guid= '4913747390'
-    prefix = 'M800'
+    prefix = 'C400'
 
     mid = ''
     vkey = ''
@@ -39,13 +39,13 @@ class Parser:
         song.mid = obj['mid']
         song.name = obj['name']
         song.albumName = obj['album']['name']
-        print ('song\n' + song.mid + '=====' + song.name + '====' + song.albumName)
+        print ('\nid\n' + song.mid + '\n歌名\n' + song.name + '\n专辑\n' + song.albumName)
 
         return song
 
     def vkeyParser(self, song):
         url = 'https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg?cid=' + song.cid + '&format=json&uin=0&guid=' + song.guid + '&songmid=' + song.mid + '&filename=' + song.prefix + song.mid + '.m4a'
-        print ('vkey url\n' + url)
+        # print ('\nvkey url\n' + url)
 
         result = json.loads(requests.get(url).text)
         vkey = result['data']['items'][0]['vkey']
@@ -53,13 +53,17 @@ class Parser:
 
     def songURL(self, song):
         url = 'http://dl.stream.qqmusic.qq.com/' + song.prefix + song.mid + '.m4a?vkey=' + song.vkey + '&guid=' + song.guid
-        print ('song url\n' + url)
+        print ('\n下载地址\n' + url)
         return url
 
     def download(self, song):
         result = requests.request('get', song.url, cookies={'qqmusic_fromtag':'66'}).content
+        path = 'music/' + song.name + '.mp4'
+        dir = os.path.dirname(path)
         if result:
-            with open(song.name + '.mp4', 'wb') as f:
+            if not os.path.exists(dir):
+                 os.makedirs(dir)
+            with open(path, 'wb') as f:
                 f.write(result)
             f.close()
 
